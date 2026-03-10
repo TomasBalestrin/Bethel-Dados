@@ -1,4 +1,4 @@
-import type { AppUser, SdrMetric, CloserMetric, SocialSellingMetric, Team, FunnelStage, FunnelEntry, Goal } from "@/lib/supabase/types";
+import type { AppUser, SdrMetric, CloserMetric, SocialSellingMetric, Team, FunnelStage, FunnelEntry, Goal, Funnel, FunnelSummary, FunnelReport, PersonProductSales } from "@/lib/supabase/types";
 
 export const mockUsers: AppUser[] = [
   { id: "1", email: "admin@bethel.com", name: "Admin Bethel", role: "admin", team_id: null, avatar_url: null, created_at: "2024-01-01" },
@@ -57,6 +57,47 @@ export const mockFunnelEntries: FunnelEntry[] = [
   ...Array.from({ length: 18 }, (_, i) => ({ id: `fe-p-${i}`, stage_id: "f3", lead_name: `Proposta ${i + 1}`, value: 10000 + Math.floor(Math.random() * 10000), assigned_to: mockUsers[1 + (i % 5)].name, created_at: "2024-01-01", updated_at: "2024-01-01" })),
   ...Array.from({ length: 10 }, (_, i) => ({ id: `fe-n-${i}`, stage_id: "f4", lead_name: `Negociação ${i + 1}`, value: 12000 + Math.floor(Math.random() * 8000), assigned_to: mockUsers[1 + (i % 5)].name, created_at: "2024-01-01", updated_at: "2024-01-01" })),
   ...Array.from({ length: 5 }, (_, i) => ({ id: `fe-f-${i}`, stage_id: "f5", lead_name: `Fechado ${i + 1}`, value: 15000 + Math.floor(Math.random() * 10000), assigned_to: mockUsers[1 + (i % 5)].name, created_at: "2024-01-01", updated_at: "2024-01-01" })),
+];
+
+// Funis / Produtos
+export const mockFunnels: Funnel[] = [
+  { id: "fun1", name: "Mentoria Premium", category: "Educação", is_active: true, created_at: "2024-01-01" },
+  { id: "fun2", name: "Consultoria Empresarial", category: "Consultoria", is_active: true, created_at: "2024-01-01" },
+  { id: "fun3", name: "Curso Online", category: "Educação", is_active: true, created_at: "2024-01-01" },
+  { id: "fun4", name: "Assessoria Financeira", category: "Financeiro", is_active: true, created_at: "2024-01-01" },
+];
+
+export const mockFunnelSummaries: FunnelSummary[] = [
+  { funnel_id: "fun1", funnel_name: "Mentoria Premium", category: "Educação", total_leads: 120, total_qualified: 85, total_calls_scheduled: 60, total_calls_done: 52, total_sales: 18, total_revenue: 162000, total_entries: 54000, conversion_rate: 15.0 },
+  { funnel_id: "fun2", funnel_name: "Consultoria Empresarial", category: "Consultoria", total_leads: 95, total_qualified: 62, total_calls_scheduled: 45, total_calls_done: 38, total_sales: 12, total_revenue: 228000, total_entries: 76000, conversion_rate: 12.6 },
+  { funnel_id: "fun3", funnel_name: "Curso Online", category: "Educação", total_leads: 250, total_qualified: 180, total_calls_scheduled: 90, total_calls_done: 78, total_sales: 45, total_revenue: 89550, total_entries: 44775, conversion_rate: 18.0 },
+  { funnel_id: "fun4", funnel_name: "Assessoria Financeira", category: "Financeiro", total_leads: 68, total_qualified: 42, total_calls_scheduled: 30, total_calls_done: 25, total_sales: 8, total_revenue: 96000, total_entries: 32000, conversion_rate: 11.8 },
+];
+
+export const mockFunnelReports: Record<string, FunnelReport> = {
+  fun1: { funnel_id: "fun1", funnel_name: "Mentoria Premium", total_leads: 120, total_qualified: 85, total_calls_scheduled: 60, total_calls_done: 52, total_sales: 18, total_revenue: 162000, total_entries: 54000, leads_to_qualified_rate: 70.8, qualified_to_scheduled_rate: 70.6, scheduled_to_done_rate: 86.7, done_to_sales_rate: 34.6 },
+  fun2: { funnel_id: "fun2", funnel_name: "Consultoria Empresarial", total_leads: 95, total_qualified: 62, total_calls_scheduled: 45, total_calls_done: 38, total_sales: 12, total_revenue: 228000, total_entries: 76000, leads_to_qualified_rate: 65.3, qualified_to_scheduled_rate: 72.6, scheduled_to_done_rate: 84.4, done_to_sales_rate: 31.6 },
+  fun3: { funnel_id: "fun3", funnel_name: "Curso Online", total_leads: 250, total_qualified: 180, total_calls_scheduled: 90, total_calls_done: 78, total_sales: 45, total_revenue: 89550, total_entries: 44775, leads_to_qualified_rate: 72.0, qualified_to_scheduled_rate: 50.0, scheduled_to_done_rate: 86.7, done_to_sales_rate: 57.7 },
+  fun4: { funnel_id: "fun4", funnel_name: "Assessoria Financeira", total_leads: 68, total_qualified: 42, total_calls_scheduled: 30, total_calls_done: 25, total_sales: 8, total_revenue: 96000, total_entries: 32000, leads_to_qualified_rate: 61.8, qualified_to_scheduled_rate: 71.4, scheduled_to_done_rate: 83.3, done_to_sales_rate: 32.0 },
+};
+
+export const mockPersonProductSales: PersonProductSales[] = [
+  // Closers
+  { person_id: "4", person_name: "Pedro Oliveira", person_type: "closer", funnel_id: "fun1", funnel_name: "Mentoria Premium", total_sales: 10, total_revenue: 90000, total_leads: 45, total_qualified: 32, total_scheduled: 25, total_done: 22, total_entries: 30000 },
+  { person_id: "4", person_name: "Pedro Oliveira", person_type: "closer", funnel_id: "fun2", funnel_name: "Consultoria Empresarial", total_sales: 5, total_revenue: 95000, total_leads: 30, total_qualified: 20, total_scheduled: 15, total_done: 12, total_entries: 31667 },
+  { person_id: "4", person_name: "Pedro Oliveira", person_type: "closer", funnel_id: "fun3", funnel_name: "Curso Online", total_sales: 20, total_revenue: 39800, total_leads: 80, total_qualified: 58, total_scheduled: 30, total_done: 28, total_entries: 19900 },
+  { person_id: "5", person_name: "Maria Costa", person_type: "closer", funnel_id: "fun1", funnel_name: "Mentoria Premium", total_sales: 8, total_revenue: 72000, total_leads: 40, total_qualified: 28, total_scheduled: 20, total_done: 18, total_entries: 24000 },
+  { person_id: "5", person_name: "Maria Costa", person_type: "closer", funnel_id: "fun2", funnel_name: "Consultoria Empresarial", total_sales: 7, total_revenue: 133000, total_leads: 35, total_qualified: 22, total_scheduled: 18, total_done: 15, total_entries: 44333 },
+  { person_id: "5", person_name: "Maria Costa", person_type: "closer", funnel_id: "fun3", funnel_name: "Curso Online", total_sales: 25, total_revenue: 49750, total_leads: 90, total_qualified: 65, total_scheduled: 35, total_done: 32, total_entries: 24875 },
+  { person_id: "5", person_name: "Maria Costa", person_type: "closer", funnel_id: "fun4", funnel_name: "Assessoria Financeira", total_sales: 8, total_revenue: 96000, total_leads: 38, total_qualified: 22, total_scheduled: 15, total_done: 13, total_entries: 32000 },
+  // SDRs
+  { person_id: "2", person_name: "Carlos Silva", person_type: "sdr", funnel_id: "fun1", funnel_name: "Mentoria Premium", total_sales: 3, total_revenue: 0, total_leads: 55, total_qualified: 40, total_scheduled: 28, total_done: 0, total_entries: 0 },
+  { person_id: "2", person_name: "Carlos Silva", person_type: "sdr", funnel_id: "fun3", funnel_name: "Curso Online", total_sales: 5, total_revenue: 0, total_leads: 100, total_qualified: 72, total_scheduled: 40, total_done: 0, total_entries: 0 },
+  { person_id: "3", person_name: "Ana Santos", person_type: "sdr", funnel_id: "fun2", funnel_name: "Consultoria Empresarial", total_sales: 2, total_revenue: 0, total_leads: 45, total_qualified: 30, total_scheduled: 22, total_done: 0, total_entries: 0 },
+  { person_id: "3", person_name: "Ana Santos", person_type: "sdr", funnel_id: "fun4", funnel_name: "Assessoria Financeira", total_sales: 1, total_revenue: 0, total_leads: 30, total_qualified: 20, total_scheduled: 15, total_done: 0, total_entries: 0 },
+  // Social Selling
+  { person_id: "6", person_name: "Lucas Ferreira", person_type: "social_selling", funnel_id: "fun1", funnel_name: "Mentoria Premium", total_sales: 2, total_revenue: 0, total_leads: 25, total_qualified: 15, total_scheduled: 7, total_done: 0, total_entries: 0 },
+  { person_id: "6", person_name: "Lucas Ferreira", person_type: "social_selling", funnel_id: "fun3", funnel_name: "Curso Online", total_sales: 8, total_revenue: 0, total_leads: 80, total_qualified: 55, total_scheduled: 25, total_done: 0, total_entries: 0 },
 ];
 
 export const mockGoals: Goal[] = [

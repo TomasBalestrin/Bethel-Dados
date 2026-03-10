@@ -10,6 +10,7 @@ import {
   Share2,
   Trophy,
   Filter,
+  FileText,
   Users,
   Upload,
   LogOut,
@@ -25,6 +26,7 @@ const navItems = [
   { href: "/dashboard/social-selling", label: "Social Selling", icon: Share2 },
   { href: "/dashboard/ranking", label: "Ranking", icon: Trophy },
   { href: "/dashboard/funil", label: "Funil", icon: Filter },
+  { href: "/dashboard/relatorios", label: "Relatórios", icon: FileText },
 ];
 
 const adminItems = [

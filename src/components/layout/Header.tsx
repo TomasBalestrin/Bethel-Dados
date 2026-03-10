@@ -15,6 +15,7 @@ const pageNames: Record<string, string> = {
   "/dashboard/social-selling": "Social Selling",
   "/dashboard/ranking": "Ranking",
   "/dashboard/funil": "Funil",
+  "/dashboard/relatorios": "Relatórios",
   "/admin/usuarios": "Usuários",
   "/admin/importar": "Importar",
 };

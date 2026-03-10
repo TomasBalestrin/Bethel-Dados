@@ -92,3 +92,56 @@ export interface FunnelEntry {
   updated_at: string;
   stage?: FunnelStage;
 }
+
+export interface Funnel {
+  id: string;
+  name: string;
+  category: string | null;
+  is_active: boolean;
+  created_at: string;
+}
+
+export interface FunnelSummary {
+  funnel_id: string;
+  funnel_name: string;
+  category: string | null;
+  total_leads: number;
+  total_qualified: number;
+  total_calls_scheduled: number;
+  total_calls_done: number;
+  total_sales: number;
+  total_revenue: number;
+  total_entries: number;
+  conversion_rate: number;
+}
+
+export interface FunnelReport {
+  funnel_id: string;
+  funnel_name: string;
+  total_leads: number;
+  total_qualified: number;
+  total_calls_scheduled: number;
+  total_calls_done: number;
+  total_sales: number;
+  total_revenue: number;
+  total_entries: number;
+  leads_to_qualified_rate: number;
+  qualified_to_scheduled_rate: number;
+  scheduled_to_done_rate: number;
+  done_to_sales_rate: number;
+}
+
+export interface PersonProductSales {
+  person_id: string;
+  person_name: string;
+  person_type: string;
+  funnel_id: string | null;
+  funnel_name: string;
+  total_sales: number;
+  total_revenue: number;
+  total_leads: number;
+  total_qualified: number;
+  total_scheduled: number;
+  total_done: number;
+  total_entries: number;
+}
