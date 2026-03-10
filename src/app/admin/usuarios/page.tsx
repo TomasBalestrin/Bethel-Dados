@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 import { mockUsers, mockTeams } from "@/model/entities/mock-data";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -29,14 +27,14 @@ export default function UsuariosPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 animate-fade-in">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-            <Users className="h-6 w-6" />
+          <h1 className="text-2xl font-bold text-foreground tracking-tight flex items-center gap-2">
+            <Users className="h-6 w-6 text-primary" />
             Gestão de Usuários
-          </h2>
-          <p className="text-muted-foreground">Gerencie os usuários e permissões do sistema</p>
+          </h1>
+          <p className="text-sm text-muted-foreground mt-0.5">Gerencie os usuários e permissões do sistema</p>
         </div>
         <Button onClick={() => setIsOpen(true)}>
           <Plus className="h-4 w-4 mr-2" />
@@ -92,40 +90,40 @@ export default function UsuariosPage() {
         </Dialog>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Usuários ({mockUsers.length})</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nome</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead>Equipe</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {mockUsers.map((user) => {
-                const team = mockTeams.find((t) => t.id === user.team_id);
-                return (
-                  <TableRow key={user.id}>
-                    <TableCell className="font-medium">{user.name}</TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>
-                      <Badge variant={roleBadgeVariant[user.role] ?? "secondary"} className="capitalize">
-                        {user.role}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{team?.name ?? "-"}</TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+      <div className="glass-card">
+        <div className="p-5 sm:p-6 space-y-4">
+          <p className="section-label">Usuários ({mockUsers.length})</p>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border/40">
+                  <th className="text-left py-2.5 px-3 text-muted-foreground font-medium text-xs">Nome</th>
+                  <th className="text-left py-2.5 px-3 text-muted-foreground font-medium text-xs">Email</th>
+                  <th className="text-left py-2.5 px-3 text-muted-foreground font-medium text-xs">Role</th>
+                  <th className="text-left py-2.5 px-3 text-muted-foreground font-medium text-xs">Equipe</th>
+                </tr>
+              </thead>
+              <tbody>
+                {mockUsers.map((user) => {
+                  const team = mockTeams.find((t) => t.id === user.team_id);
+                  return (
+                    <tr key={user.id} className="border-b border-border/20 last:border-0">
+                      <td className="py-2.5 px-3 font-medium">{user.name}</td>
+                      <td className="py-2.5 px-3 text-muted-foreground">{user.email}</td>
+                      <td className="py-2.5 px-3">
+                        <Badge variant={roleBadgeVariant[user.role] ?? "secondary"} className="capitalize">
+                          {user.role}
+                        </Badge>
+                      </td>
+                      <td className="py-2.5 px-3 text-muted-foreground">{team?.name ?? "-"}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

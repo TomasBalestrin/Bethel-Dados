@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -33,20 +32,21 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="flex justify-center mb-4">
-            <div className="h-12 w-12 rounded-xl bg-primary flex items-center justify-center">
-              <BarChart3 className="h-6 w-6 text-primary-foreground" />
+      <div className="w-full max-w-sm animate-fade-in">
+        <div className="glass-card p-6 sm:p-8">
+          {/* Logo */}
+          <div className="text-center mb-8">
+            <div className="inline-flex p-3 rounded-2xl bg-primary/10 mb-4">
+              <BarChart3 className="h-8 w-8 text-primary" />
             </div>
+            <h1 className="text-xl font-bold text-foreground tracking-tight">Bethel Dados</h1>
+            <p className="text-sm text-muted-foreground mt-1">Entre com suas credenciais</p>
           </div>
-          <CardTitle className="text-2xl">Bethel Dados</CardTitle>
-          <CardDescription>Entre com suas credenciais para acessar o sistema</CardDescription>
-        </CardHeader>
-        <CardContent>
+
+          {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+            <div className="space-y-1.5">
+              <Label htmlFor="email" className="text-xs font-medium">Email</Label>
               <Input
                 id="email"
                 type="email"
@@ -54,10 +54,11 @@ export default function AuthPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                className="h-10"
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Senha</Label>
+            <div className="space-y-1.5">
+              <Label htmlFor="password" className="text-xs font-medium">Senha</Label>
               <Input
                 id="password"
                 type="password"
@@ -65,22 +66,26 @@ export default function AuthPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                className="h-10"
               />
             </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button type="submit" className="w-full h-10 font-medium" disabled={isLoading}>
               {isLoading ? "Entrando..." : "Entrar"}
             </Button>
           </form>
 
-          <div className="mt-6 p-3 rounded-md bg-muted text-xs text-muted-foreground">
-            <p className="font-medium mb-1">Contas de teste:</p>
-            <p>Admin: admin@bethel.com</p>
-            <p>Gestor: julia@bethel.com</p>
-            <p>Vendedor: carlos@bethel.com</p>
-            <p className="mt-1 italic">Qualquer senha funciona</p>
+          {/* Test accounts */}
+          <div className="mt-6 p-3 rounded-xl bg-muted/50 border border-border/30">
+            <p className="section-label mb-2">Contas de teste</p>
+            <div className="space-y-0.5 text-xs text-muted-foreground">
+              <p><span className="font-medium text-foreground">Admin:</span> admin@bethel.com</p>
+              <p><span className="font-medium text-foreground">Gestor:</span> julia@bethel.com</p>
+              <p><span className="font-medium text-foreground">Vendedor:</span> carlos@bethel.com</p>
+              <p className="mt-1.5 italic text-[11px]">Qualquer senha funciona</p>
+            </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

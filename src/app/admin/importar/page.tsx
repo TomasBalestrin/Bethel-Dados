@@ -1,11 +1,9 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Upload, FileSpreadsheet, CheckCircle, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
@@ -50,23 +48,24 @@ export default function ImportarPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 animate-fade-in">
       <div>
-        <h2 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-          <Upload className="h-6 w-6" />
+        <h1 className="text-2xl font-bold text-foreground tracking-tight flex items-center gap-2">
+          <Upload className="h-6 w-6 text-info" />
           Importar Dados
-        </h2>
-        <p className="text-muted-foreground">Importe dados via CSV ou Excel</p>
+        </h1>
+        <p className="text-sm text-muted-foreground mt-0.5">Importe dados via CSV ou Excel</p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Nova Importação</CardTitle>
-          <CardDescription>Selecione o tipo de dados e faça upload do arquivo</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
+      <div className="glass-card">
+        <div className="p-5 sm:p-6 space-y-5">
+          <div>
+            <p className="section-label">Nova Importação</p>
+            <p className="text-xs text-muted-foreground mt-1">Selecione o tipo de dados e faça upload do arquivo</p>
+          </div>
+
           <div className="space-y-2">
-            <Label>Tipo de Dados</Label>
+            <Label className="text-xs font-medium">Tipo de Dados</Label>
             <Select value={selectedType} onValueChange={(v) => setSelectedType(v ?? "")}>
               <SelectTrigger className="w-full max-w-xs">
                 <SelectValue placeholder="Selecionar tipo" />
@@ -81,9 +80,9 @@ export default function ImportarPage() {
           </div>
 
           <div className="space-y-2">
-            <Label>Arquivo (CSV ou Excel)</Label>
+            <Label className="text-xs font-medium">Arquivo (CSV ou Excel)</Label>
             <div
-              className="border-2 border-dashed rounded-lg p-8 text-center cursor-pointer hover:border-primary/50 transition-colors"
+              className="border-2 border-dashed border-border/40 rounded-xl p-8 text-center cursor-pointer hover:border-primary/50 transition-colors bg-muted/20"
               onClick={() => fileInputRef.current?.click()}
             >
               <input
@@ -114,52 +113,52 @@ export default function ImportarPage() {
             <Upload className="h-4 w-4 mr-2" />
             Importar Dados
           </Button>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Histórico de Importações</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Arquivo</TableHead>
-                <TableHead>Tipo</TableHead>
-                <TableHead>Linhas</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Data</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {mockImports.map((imp) => (
-                <TableRow key={imp.id}>
-                  <TableCell className="font-medium">{imp.filename}</TableCell>
-                  <TableCell>
-                    <Badge variant="secondary">{imp.type}</Badge>
-                  </TableCell>
-                  <TableCell>{imp.rows}</TableCell>
-                  <TableCell>
-                    {imp.status === "success" ? (
-                      <span className="flex items-center gap-1 text-green-600 text-sm">
-                        <CheckCircle className="h-3 w-3" /> Sucesso
-                      </span>
-                    ) : (
-                      <span className="flex items-center gap-1 text-red-600 text-sm">
-                        <AlertCircle className="h-3 w-3" /> Erro
-                      </span>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {new Date(imp.date).toLocaleDateString("pt-BR")}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+      <div className="glass-card">
+        <div className="p-5 sm:p-6 space-y-4">
+          <p className="section-label">Histórico de Importações</p>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border/40">
+                  <th className="text-left py-2.5 px-3 text-muted-foreground font-medium text-xs">Arquivo</th>
+                  <th className="text-left py-2.5 px-3 text-muted-foreground font-medium text-xs">Tipo</th>
+                  <th className="text-left py-2.5 px-3 text-muted-foreground font-medium text-xs">Linhas</th>
+                  <th className="text-left py-2.5 px-3 text-muted-foreground font-medium text-xs">Status</th>
+                  <th className="text-left py-2.5 px-3 text-muted-foreground font-medium text-xs">Data</th>
+                </tr>
+              </thead>
+              <tbody>
+                {mockImports.map((imp) => (
+                  <tr key={imp.id} className="border-b border-border/20 last:border-0">
+                    <td className="py-2.5 px-3 font-medium">{imp.filename}</td>
+                    <td className="py-2.5 px-3">
+                      <Badge variant="secondary">{imp.type}</Badge>
+                    </td>
+                    <td className="py-2.5 px-3">{imp.rows}</td>
+                    <td className="py-2.5 px-3">
+                      {imp.status === "success" ? (
+                        <span className="flex items-center gap-1 text-success text-sm">
+                          <CheckCircle className="h-3 w-3" /> Sucesso
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-1 text-destructive text-sm">
+                          <AlertCircle className="h-3 w-3" /> Erro
+                        </span>
+                      )}
+                    </td>
+                    <td className="py-2.5 px-3 text-muted-foreground">
+                      {new Date(imp.date).toLocaleDateString("pt-BR")}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

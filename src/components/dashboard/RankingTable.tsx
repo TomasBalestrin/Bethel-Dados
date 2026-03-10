@@ -1,6 +1,5 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Trophy, Medal, Award } from "lucide-react";
@@ -28,11 +27,9 @@ function PositionIcon({ position }: { position: number }) {
 
 export function RankingTable({ title, entries }: RankingTableProps) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">{title}</CardTitle>
-      </CardHeader>
-      <CardContent>
+    <div className="glass-card animate-fade-in">
+      <div className="p-5 sm:p-6">
+        <p className="section-label mb-4">{title}</p>
         <Table>
           <TableHeader>
             <TableRow>
@@ -52,12 +49,12 @@ export function RankingTable({ title, entries }: RankingTableProps) {
                 <TableCell>
                   <Badge variant="secondary">{entry.team}</Badge>
                 </TableCell>
-                <TableCell className="text-right font-medium">{entry.metric}</TableCell>
+                <TableCell className="text-right font-semibold">{entry.metric}</TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

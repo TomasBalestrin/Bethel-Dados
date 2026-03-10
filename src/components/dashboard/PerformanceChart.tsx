@@ -1,8 +1,7 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, CartesianGrid } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 
 interface PerformanceChartProps {
   title: string;
@@ -33,22 +32,20 @@ export function PerformanceChart({
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">{title}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <ChartContainer config={config} className="h-[300px] w-full">
+    <div className="glass-card animate-fade-in">
+      <div className="p-5 sm:p-6">
+        <p className="section-label mb-4">{title}</p>
+        <ChartContainer config={config} className="h-[280px] w-full">
           <BarChart data={data}>
             <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-            <XAxis dataKey="name" className="text-xs" tick={{ fontSize: 12 }} />
-            <YAxis className="text-xs" tick={{ fontSize: 12 }} />
+            <XAxis dataKey="name" className="text-xs" tick={{ fontSize: 11 }} />
+            <YAxis className="text-xs" tick={{ fontSize: 11 }} />
             <ChartTooltip content={<ChartTooltipContent />} />
-            <Bar dataKey={dataKey} fill={color} radius={[4, 4, 0, 0]} />
-            {dataKey2 && <Bar dataKey={dataKey2} fill={color2} radius={[4, 4, 0, 0]} />}
+            <Bar dataKey={dataKey} fill={color} radius={[6, 6, 0, 0]} />
+            {dataKey2 && <Bar dataKey={dataKey2} fill={color2} radius={[6, 6, 0, 0]} />}
           </BarChart>
         </ChartContainer>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

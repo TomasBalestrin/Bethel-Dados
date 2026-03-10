@@ -4,8 +4,6 @@ import { FunnelChart } from "@/components/dashboard/FunnelChart";
 import { MetricCard } from "@/components/dashboard/MetricCard";
 import { mockFunnelStages, mockFunnelEntries } from "@/model/entities/mock-data";
 import { Filter, DollarSign, TrendingUp, Users } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 
 export default function FunilPage() {
@@ -31,9 +29,7 @@ export default function FunilPage() {
   const totalValue = stageData.reduce((s, st) => s + st.value, 0);
   const closedValue = stageData[stageData.length - 1]?.value ?? 0;
   const overallConversion = totalLeads > 0 ? ((stageData[stageData.length - 1]?.count ?? 0) / totalLeads) * 100 : 0;
-  const avgDealValue = totalValue / mockFunnelEntries.length;
 
-  // Stage-to-stage conversion
   const stageConversions = stageData.map((stage, i) => {
     if (i === 0) return { from: "-", to: stage.name, rate: 100 };
     return {
@@ -44,13 +40,13 @@ export default function FunilPage() {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 animate-fade-in">
       <div>
-        <h2 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-          <Filter className="h-6 w-6" />
+        <h1 className="text-2xl font-bold text-foreground tracking-tight flex items-center gap-2">
+          <Filter className="h-6 w-6 text-info" />
           Funil de Vendas
-        </h2>
-        <p className="text-muted-foreground">Visualização completa do pipeline de vendas</p>
+        </h1>
+        <p className="text-sm text-muted-foreground mt-0.5">Visualização completa do pipeline de vendas</p>
       </div>
 
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
@@ -62,57 +58,54 @@ export default function FunilPage() {
 
       <FunnelChart title="Pipeline de Vendas" stages={funnelChartData} />
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Conversão entre Etapas</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>De</TableHead>
-                <TableHead>Para</TableHead>
-                <TableHead className="text-right">Taxa de Conversão</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {stageConversions.slice(1).map((conv) => (
-                <TableRow key={conv.to}>
-                  <TableCell>{conv.from}</TableCell>
-                  <TableCell>{conv.to}</TableCell>
-                  <TableCell className="text-right">
-                    <Badge variant={conv.rate > 50 ? "default" : "secondary"}>
-                      {conv.rate.toFixed(1)}%
-                    </Badge>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+      <div className="glass-card">
+        <div className="p-5 sm:p-6 space-y-4">
+          <p className="section-label">Conversão entre Etapas</p>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border/40">
+                  <th className="text-left py-2.5 px-3 text-muted-foreground font-medium text-xs">De</th>
+                  <th className="text-left py-2.5 px-3 text-muted-foreground font-medium text-xs">Para</th>
+                  <th className="text-right py-2.5 px-3 text-muted-foreground font-medium text-xs">Taxa de Conversão</th>
+                </tr>
+              </thead>
+              <tbody>
+                {stageConversions.slice(1).map((conv) => (
+                  <tr key={conv.to} className="border-b border-border/20 last:border-0">
+                    <td className="py-2.5 px-3">{conv.from}</td>
+                    <td className="py-2.5 px-3">{conv.to}</td>
+                    <td className="py-2.5 px-3 text-right">
+                      <Badge variant={conv.rate > 50 ? "default" : "secondary"}>
+                        {conv.rate.toFixed(1)}%
+                      </Badge>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Detalhes por Etapa</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <div className="glass-card">
+        <div className="p-5 sm:p-6 space-y-4">
+          <p className="section-label">Detalhes por Etapa</p>
           <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
             {stageData.map((stage) => (
               <div
                 key={stage.id}
-                className="p-4 rounded-lg border text-center space-y-1"
-                style={{ borderColor: stage.color }}
+                className="p-4 rounded-xl bg-muted/30 border border-border/20 text-center space-y-1"
+                style={{ borderTopColor: stage.color, borderTopWidth: "3px" }}
               >
-                <div className="h-2 rounded-full mb-2" style={{ backgroundColor: stage.color }} />
                 <p className="text-sm font-medium">{stage.name}</p>
                 <p className="text-2xl font-bold">{stage.count}</p>
                 <p className="text-xs text-muted-foreground">R$ {(stage.value / 1000).toFixed(0)}k</p>
               </div>
             ))}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }
