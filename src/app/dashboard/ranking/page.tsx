@@ -1,35 +1,53 @@
 "use client";
 
 import { RankingTable } from "@/components/dashboard/RankingTable";
-import { mockSdrMetrics, mockCloserMetrics, mockSocialSellingMetrics, mockUsers, mockGoals } from "@/model/entities/mock-data";
+import { useUsers, useSdrMetrics, useCloserMetrics, useSocialSellingMetrics, useGoals } from "@/hooks/use-data";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Trophy, Target, Award } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function RankingPage() {
-  const sdrRanking = mockUsers
+  const { data: users, isLoading: loadingUsers } = useUsers();
+  const { data: sdrMetrics, isLoading: loadingSdr } = useSdrMetrics();
+  const { data: closerMetrics, isLoading: loadingCloser } = useCloserMetrics();
+  const { data: socialMetrics, isLoading: loadingSocial } = useSocialSellingMetrics();
+  const { data: goals, isLoading: loadingGoals } = useGoals();
+
+  const isLoading = loadingUsers || loadingSdr || loadingCloser || loadingSocial || loadingGoals;
+
+  if (isLoading) {
+    return (
+      <div className="space-y-8 animate-fade-in">
+        <Skeleton className="h-8 w-64" />
+        <Skeleton className="h-48" />
+      </div>
+    );
+  }
+
+  const sdrRanking = users
     .filter((u) => u.team_id === "t1")
     .map((user) => {
-      const metrics = mockSdrMetrics.filter((m) => m.user_id === user.id);
+      const metrics = sdrMetrics.filter((m) => m.user_id === user.id);
       return { position: 0, name: user.name, team: "SDR", metric: metrics.reduce((s, m) => s + m.meetings_scheduled, 0), metricLabel: "Reuniões Agendadas" };
     }).sort((a, b) => (b.metric as number) - (a.metric as number)).map((e, i) => ({ ...e, position: i + 1 }));
 
-  const closerRanking = mockUsers
+  const closerRanking = users
     .filter((u) => u.team_id === "t2")
     .map((user) => {
-      const metrics = mockCloserMetrics.filter((m) => m.user_id === user.id);
+      const metrics = closerMetrics.filter((m) => m.user_id === user.id);
       const rev = metrics.reduce((s, m) => s + m.revenue, 0);
       return { position: 0, name: user.name, team: "Closer", metric: `R$ ${(rev / 1000).toFixed(0)}k`, metricLabel: "Receita", _numericMetric: rev };
     }).sort((a, b) => b._numericMetric - a._numericMetric).map((e, i) => ({ ...e, position: i + 1 }));
 
-  const ssRanking = mockUsers
+  const ssRanking = users
     .filter((u) => u.team_id === "t3")
     .map((user) => {
-      const metrics = mockSocialSellingMetrics.filter((m) => m.user_id === user.id);
+      const metrics = socialMetrics.filter((m) => m.user_id === user.id);
       return { position: 0, name: user.name, team: "Social Selling", metric: metrics.reduce((s, m) => s + m.leads_generated, 0), metricLabel: "Leads Gerados" };
     }).sort((a, b) => (b.metric as number) - (a.metric as number)).map((e, i) => ({ ...e, position: i + 1 }));
 
-  const goalsProgress = mockGoals.map((goal) => {
-    const user = mockUsers.find((u) => u.id === goal.user_id);
+  const goalsProgress = goals.map((goal) => {
+    const user = users.find((u) => u.id === goal.user_id);
     return { ...goal, userName: user?.name ?? "Equipe", percent: Math.min((goal.current_value / goal.target_value) * 100, 100) };
   });
 

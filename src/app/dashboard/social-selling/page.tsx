@@ -2,16 +2,37 @@
 
 import { MetricCard } from "@/components/dashboard/MetricCard";
 import { PerformanceChart } from "@/components/dashboard/PerformanceChart";
-import { mockSocialSellingMetrics, mockGoals } from "@/model/entities/mock-data";
+import { useSocialSellingMetrics, useGoals } from "@/hooks/use-data";
 import { Share2, Heart, UserPlus, MessageSquare, Target } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function SocialSellingPage() {
-  const totalPosts = mockSocialSellingMetrics.reduce((s, m) => s + m.posts_published, 0);
-  const avgEngagement = mockSocialSellingMetrics.reduce((s, m) => s + m.engagement_rate, 0) / mockSocialSellingMetrics.length;
-  const totalLeads = mockSocialSellingMetrics.reduce((s, m) => s + m.leads_generated, 0);
-  const totalConnections = mockSocialSellingMetrics.reduce((s, m) => s + m.connections_made, 0);
-  const totalMessages = mockSocialSellingMetrics.reduce((s, m) => s + m.messages_sent, 0);
+  const { data: socialMetrics, isLoading: loadingSocial } = useSocialSellingMetrics();
+  const { data: goals, isLoading: loadingGoals } = useGoals();
+
+  const isLoading = loadingSocial || loadingGoals;
+
+  if (isLoading) {
+    return (
+      <div className="space-y-8 animate-fade-in">
+        <Skeleton className="h-8 w-64" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <Skeleton className="h-24" />
+          <Skeleton className="h-24" />
+          <Skeleton className="h-24" />
+        </div>
+      </div>
+    );
+  }
+
+  const totalPosts = socialMetrics.reduce((s, m) => s + m.posts_published, 0);
+  const avgEngagement = socialMetrics.length > 0
+    ? socialMetrics.reduce((s, m) => s + m.engagement_rate, 0) / socialMetrics.length
+    : 0;
+  const totalLeads = socialMetrics.reduce((s, m) => s + m.leads_generated, 0);
+  const totalConnections = socialMetrics.reduce((s, m) => s + m.connections_made, 0);
+  const totalMessages = socialMetrics.reduce((s, m) => s + m.messages_sent, 0);
 
   const weeklyData = Array.from({ length: 7 }, (_, i) => {
     const d = new Date();
@@ -19,14 +40,14 @@ export default function SocialSellingPage() {
     const dateStr = d.toISOString().split("T")[0];
     return {
       name: d.toLocaleDateString("pt-BR", { weekday: "short" }),
-      value: mockSocialSellingMetrics.filter((m) => m.date === dateStr).reduce((s, m) => s + m.posts_published, 0),
-      value2: mockSocialSellingMetrics.filter((m) => m.date === dateStr).reduce((s, m) => s + m.leads_generated, 0),
+      value: socialMetrics.filter((m) => m.date === dateStr).reduce((s, m) => s + m.posts_published, 0),
+      value2: socialMetrics.filter((m) => m.date === dateStr).reduce((s, m) => s + m.leads_generated, 0),
     };
   });
 
   const channels = ["linkedin", "instagram", "twitter", "other"] as const;
   const channelData = channels.map((ch) => {
-    const metrics = mockSocialSellingMetrics.filter((m) => m.channel === ch);
+    const metrics = socialMetrics.filter((m) => m.channel === ch);
     return {
       channel: ch,
       posts: metrics.reduce((s, m) => s + m.posts_published, 0),
@@ -35,7 +56,7 @@ export default function SocialSellingPage() {
     };
   }).filter((c) => c.posts > 0);
 
-  const ssGoals = mockGoals.filter((g) => g.team_id === "t3");
+  const ssGoals = goals.filter((g) => g.team_id === "t3");
 
   return (
     <div className="space-y-8 animate-fade-in">

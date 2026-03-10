@@ -9,17 +9,34 @@ import { MetricCard } from "@/components/dashboard/MetricCard";
 import { FunnelReportChart } from "@/components/dashboard/FunnelReportChart";
 import { ProductSalesTable } from "@/components/dashboard/ProductSalesTable";
 import { EditableCell } from "@/components/dashboard/EditableCell";
-import { mockFunnelSummaries, mockFunnelReports, mockPersonProductSales } from "@/model/entities/mock-data";
+import { useFunnelSummaries, useFunnelReports, usePersonProductSales } from "@/hooks/use-data";
 import { toast } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton";
+import type { FunnelReport } from "@/lib/supabase/types";
 
 export default function RelatoriosPage() {
   const [selectedFunnelId, setSelectedFunnelId] = useState<string | null>(null);
 
+  const { data: funnelSummaries, isLoading: loadingSummaries } = useFunnelSummaries();
+  const { data: funnelReports, isLoading: loadingReports } = useFunnelReports();
+  const { data: personProductSales, isLoading: loadingSales } = usePersonProductSales();
+
+  const isLoading = loadingSummaries || loadingReports || loadingSales;
+
+  // Converte array de reports em Record para acesso por ID  
+  const funnelReportsMap = useMemo(() => {
+    const map: Record<string, FunnelReport> = {};
+    funnelReports.forEach((r) => {
+      map[r.funnel_id] = r;
+    });
+    return map;
+  }, [funnelReports]);
+
   const displayedSummaries = useMemo(() => {
     return selectedFunnelId
-      ? mockFunnelSummaries.filter((f) => f.funnel_id === selectedFunnelId)
-      : mockFunnelSummaries;
-  }, [selectedFunnelId]);
+      ? funnelSummaries.filter((f) => f.funnel_id === selectedFunnelId)
+      : funnelSummaries;
+  }, [selectedFunnelId, funnelSummaries]);
 
   const totals = useMemo(() => {
     if (displayedSummaries.length === 0) return null;
@@ -34,7 +51,7 @@ export default function RelatoriosPage() {
     };
   }, [displayedSummaries]);
 
-  const detailedReport = selectedFunnelId ? mockFunnelReports[selectedFunnelId] : null;
+  const detailedReport = selectedFunnelId ? funnelReportsMap[selectedFunnelId] : null;
 
   const formatCurrency = (v: number) =>
     new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v);
@@ -42,6 +59,15 @@ export default function RelatoriosPage() {
   const handleCellSave = () => {
     toast.success("Valor atualizado! (mock)");
   };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-8 animate-fade-in">
+        <Skeleton className="h-8 w-64" />
+        <Skeleton className="h-48" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -78,7 +104,7 @@ export default function RelatoriosPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todos os Funis</SelectItem>
-                {mockFunnelSummaries.map((f) => (
+                {funnelSummaries.map((f) => (
                   <SelectItem key={f.funnel_id} value={f.funnel_id}>
                     {f.funnel_name}
                   </SelectItem>
@@ -169,7 +195,7 @@ export default function RelatoriosPage() {
         <TabsContent value="by-product" className="mt-4">
           <div className="glass-card">
             <div className="p-5 sm:p-6">
-              <ProductSalesTable data={mockPersonProductSales} canEdit={true} />
+              <ProductSalesTable data={personProductSales} canEdit={true} />
             </div>
           </div>
         </TabsContent>

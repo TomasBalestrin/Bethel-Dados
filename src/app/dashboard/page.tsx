@@ -4,23 +4,55 @@ import { MetricCard } from "@/components/dashboard/MetricCard";
 import { PerformanceChart } from "@/components/dashboard/PerformanceChart";
 import { FunnelChart } from "@/components/dashboard/FunnelChart";
 import { RankingTable } from "@/components/dashboard/RankingTable";
-import { mockSdrMetrics, mockCloserMetrics, mockSocialSellingMetrics, mockFunnelStages, mockFunnelEntries, mockUsers } from "@/model/entities/mock-data";
+import { useUsers, useSdrMetrics, useCloserMetrics, useSocialSellingMetrics, useFunnelStages, useFunnelEntries } from "@/hooks/use-data";
 import { DollarSign, Phone, Handshake, Target, TrendingUp, XCircle } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function DashboardOverview() {
-  const totalCalls = mockSdrMetrics.reduce((sum, m) => sum + m.calls_made, 0);
-  const totalMeetings = mockSdrMetrics.reduce((sum, m) => sum + m.meetings_scheduled, 0);
-  const totalDeals = mockCloserMetrics.reduce((sum, m) => sum + m.deals_closed, 0);
-  const totalRevenue = mockCloserMetrics.reduce((sum, m) => sum + m.revenue, 0);
-  const totalLeads = mockSocialSellingMetrics.reduce((sum, m) => sum + m.leads_generated, 0);
-  const avgConversion = mockCloserMetrics.reduce((sum, m) => sum + m.conversion_rate, 0) / mockCloserMetrics.length;
+  const { data: users, isLoading: loadingUsers } = useUsers();
+  const { data: sdrMetrics, isLoading: loadingSdr } = useSdrMetrics();
+  const { data: closerMetrics, isLoading: loadingCloser } = useCloserMetrics();
+  const { data: socialMetrics, isLoading: loadingSocial } = useSocialSellingMetrics();
+  const { data: funnelStages, isLoading: loadingStages } = useFunnelStages();
+  const { data: funnelEntries, isLoading: loadingEntries } = useFunnelEntries();
+
+  const isLoading = loadingUsers || loadingSdr || loadingCloser || loadingSocial || loadingStages || loadingEntries;
+
+  if (isLoading) {
+    return (
+      <div className="space-y-8 animate-fade-in">
+        <div>
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-4 w-72 mt-2" />
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Skeleton className="h-32" />
+          <Skeleton className="h-32" />
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <Skeleton className="h-24" />
+          <Skeleton className="h-24" />
+          <Skeleton className="h-24" />
+        </div>
+      </div>
+    );
+  }
+
+  const totalCalls = sdrMetrics.reduce((sum, m) => sum + m.calls_made, 0);
+  const totalMeetings = sdrMetrics.reduce((sum, m) => sum + m.meetings_scheduled, 0);
+  const totalDeals = closerMetrics.reduce((sum, m) => sum + m.deals_closed, 0);
+  const totalRevenue = closerMetrics.reduce((sum, m) => sum + m.revenue, 0);
+  const totalLeads = socialMetrics.reduce((sum, m) => sum + m.leads_generated, 0);
+  const avgConversion = closerMetrics.length > 0
+    ? closerMetrics.reduce((sum, m) => sum + m.conversion_rate, 0) / closerMetrics.length
+    : 0;
 
   const last7 = Array.from({ length: 7 }, (_, i) => {
     const d = new Date();
     d.setDate(d.getDate() - (6 - i));
     const dateStr = d.toISOString().split("T")[0];
-    const dayCalls = mockSdrMetrics.filter((m) => m.date === dateStr).reduce((s, m) => s + m.calls_made, 0);
-    const dayRevenue = mockCloserMetrics.filter((m) => m.date === dateStr).reduce((s, m) => s + m.revenue, 0);
+    const dayCalls = sdrMetrics.filter((m) => m.date === dateStr).reduce((s, m) => s + m.calls_made, 0);
+    const dayRevenue = closerMetrics.filter((m) => m.date === dateStr).reduce((s, m) => s + m.revenue, 0);
     return {
       name: d.toLocaleDateString("pt-BR", { weekday: "short" }),
       value: dayCalls,
@@ -28,8 +60,8 @@ export default function DashboardOverview() {
     };
   });
 
-  const funnelData = mockFunnelStages.map((stage) => {
-    const entries = mockFunnelEntries.filter((e) => e.stage_id === stage.id);
+  const funnelData = funnelStages.map((stage) => {
+    const entries = funnelEntries.filter((e) => e.stage_id === stage.id);
     return { name: stage.name, count: entries.length, value: entries.reduce((s, e) => s + e.value, 0), color: stage.color };
   });
   const funnelWithConversion = funnelData.map((stage, i) => ({
@@ -37,19 +69,19 @@ export default function DashboardOverview() {
     conversionRate: i === 0 ? 100 : (stage.count / funnelData[0].count) * 100,
   }));
 
-  const sdrRanking = mockUsers
+  const sdrRanking = users
     .filter((u) => u.team_id === "t1")
     .map((user) => {
-      const metrics = mockSdrMetrics.filter((m) => m.user_id === user.id);
+      const metrics = sdrMetrics.filter((m) => m.user_id === user.id);
       return { position: 0, name: user.name, team: "SDR", metric: metrics.reduce((s, m) => s + m.meetings_scheduled, 0), metricLabel: "Reuniões" };
     })
     .sort((a, b) => (b.metric as number) - (a.metric as number))
     .map((e, i) => ({ ...e, position: i + 1 }));
 
-  const closerRanking = mockUsers
+  const closerRanking = users
     .filter((u) => u.team_id === "t2")
     .map((user) => {
-      const metrics = mockCloserMetrics.filter((m) => m.user_id === user.id);
+      const metrics = closerMetrics.filter((m) => m.user_id === user.id);
       const rev = metrics.reduce((s, m) => s + m.revenue, 0);
       return { position: 0, name: user.name, team: "Closer", metric: `R$ ${(rev / 1000).toFixed(0)}k`, metricLabel: "Receita" };
     })
@@ -87,7 +119,7 @@ export default function DashboardOverview() {
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
           <MetricCard title="Leads Gerados" value={totalLeads} icon={TrendingUp} variant="info" compact />
           <MetricCard title="Conversão Média" value={`${avgConversion.toFixed(1)}%`} icon={Target} variant="warning" compact />
-          <MetricCard title="Total Membros" value={mockUsers.filter((u) => u.team_id).length} icon={XCircle} compact />
+          <MetricCard title="Total Membros" value={users.filter((u) => u.team_id).length} icon={XCircle} compact />
         </div>
       </div>
 

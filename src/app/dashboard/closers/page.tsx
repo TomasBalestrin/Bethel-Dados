@@ -3,16 +3,35 @@
 import { MetricCard } from "@/components/dashboard/MetricCard";
 import { PerformanceChart } from "@/components/dashboard/PerformanceChart";
 import { RankingTable } from "@/components/dashboard/RankingTable";
-import { mockCloserMetrics, mockUsers, mockGoals } from "@/model/entities/mock-data";
+import { useUsers, useCloserMetrics, useGoals } from "@/hooks/use-data";
 import { Handshake, FileText, DollarSign, Target, TrendingUp } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function ClosersPage() {
-  const closerUsers = mockUsers.filter((u) => u.team_id === "t2");
+  const { data: users, isLoading: loadingUsers } = useUsers();
+  const { data: closerMetrics, isLoading: loadingCloser } = useCloserMetrics();
+  const { data: goals, isLoading: loadingGoals } = useGoals();
 
-  const totalMeetings = mockCloserMetrics.reduce((s, m) => s + m.meetings_held, 0);
-  const totalProposals = mockCloserMetrics.reduce((s, m) => s + m.proposals_sent, 0);
-  const totalDeals = mockCloserMetrics.reduce((s, m) => s + m.deals_closed, 0);
-  const totalRevenue = mockCloserMetrics.reduce((s, m) => s + m.revenue, 0);
+  const isLoading = loadingUsers || loadingCloser || loadingGoals;
+
+  if (isLoading) {
+    return (
+      <div className="space-y-8 animate-fade-in">
+        <Skeleton className="h-8 w-48" />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Skeleton className="h-32" />
+          <Skeleton className="h-32" />
+        </div>
+      </div>
+    );
+  }
+
+  const closerUsers = users.filter((u) => u.team_id === "t2");
+
+  const totalMeetings = closerMetrics.reduce((s, m) => s + m.meetings_held, 0);
+  const totalProposals = closerMetrics.reduce((s, m) => s + m.proposals_sent, 0);
+  const totalDeals = closerMetrics.reduce((s, m) => s + m.deals_closed, 0);
+  const totalRevenue = closerMetrics.reduce((s, m) => s + m.revenue, 0);
   const avgTicket = totalRevenue / (totalDeals || 1);
 
   const weeklyData = Array.from({ length: 7 }, (_, i) => {
@@ -21,18 +40,18 @@ export default function ClosersPage() {
     const dateStr = d.toISOString().split("T")[0];
     return {
       name: d.toLocaleDateString("pt-BR", { weekday: "short" }),
-      value: mockCloserMetrics.filter((m) => m.date === dateStr).reduce((s, m) => s + m.deals_closed, 0),
-      value2: Math.round(mockCloserMetrics.filter((m) => m.date === dateStr).reduce((s, m) => s + m.revenue, 0) / 1000),
+      value: closerMetrics.filter((m) => m.date === dateStr).reduce((s, m) => s + m.deals_closed, 0),
+      value2: Math.round(closerMetrics.filter((m) => m.date === dateStr).reduce((s, m) => s + m.revenue, 0) / 1000),
     };
   });
 
   const closerRanking = closerUsers.map((user) => {
-    const metrics = mockCloserMetrics.filter((m) => m.user_id === user.id);
+    const metrics = closerMetrics.filter((m) => m.user_id === user.id);
     const revenue = metrics.reduce((s, m) => s + m.revenue, 0);
     return { position: 0, name: user.name, team: "Closer", metric: `R$ ${(revenue / 1000).toFixed(0)}k`, metricLabel: "Receita" };
   }).sort((a, b) => parseInt(b.metric as string) - parseInt(a.metric as string)).map((e, i) => ({ ...e, position: i + 1 }));
 
-  const closerGoals = mockGoals.filter((g) => g.team_id === "t2");
+  const closerGoals = goals.filter((g) => g.team_id === "t2");
 
   return (
     <div className="space-y-8 animate-fade-in">

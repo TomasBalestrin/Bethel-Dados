@@ -2,13 +2,33 @@
 
 import { FunnelChart } from "@/components/dashboard/FunnelChart";
 import { MetricCard } from "@/components/dashboard/MetricCard";
-import { mockFunnelStages, mockFunnelEntries } from "@/model/entities/mock-data";
+import { useFunnelStages, useFunnelEntries } from "@/hooks/use-data";
 import { Filter, DollarSign, TrendingUp, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function FunilPage() {
-  const stageData = mockFunnelStages.map((stage) => {
-    const entries = mockFunnelEntries.filter((e) => e.stage_id === stage.id);
+  const { data: funnelStages, isLoading: loadingStages } = useFunnelStages();
+  const { data: funnelEntries, isLoading: loadingEntries } = useFunnelEntries();
+
+  const isLoading = loadingStages || loadingEntries;
+
+  if (isLoading) {
+    return (
+      <div className="space-y-8 animate-fade-in">
+        <Skeleton className="h-8 w-48" />
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+          <Skeleton className="h-24" />
+          <Skeleton className="h-24" />
+          <Skeleton className="h-24" />
+          <Skeleton className="h-24" />
+        </div>
+      </div>
+    );
+  }
+
+  const stageData = funnelStages.map((stage) => {
+    const entries = funnelEntries.filter((e) => e.stage_id === stage.id);
     return {
       ...stage,
       count: entries.length,
